@@ -18,5 +18,6 @@ add_executable( HandEval
                 HandEval.cpp
                 HandIter.cpp
                 TestCases.cpp
+                ProbEval.cpp
                 )
 target_include_directories(HandEval PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

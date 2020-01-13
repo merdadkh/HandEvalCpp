@@ -1,25 +1,6 @@
 
 #include "ProbEval.h"
 
-inline bool FlushSymmType::operator< (const FlushSymmType& rhs) const {
-	if (drawType[0] < rhs.drawType[0])										return true;
-	else if (drawType[0] == rhs.drawType[0]) {
-		if (drawType[1] < rhs.drawType[1])									return true;
-		else if (drawType[1] == rhs.drawType[1]){
-			if ((SameSuit == false) && (rhs.SameSuit == true))				return true;
-			else if (SameSuit == rhs.SameSuit){
-				if (HigherCard[0] < rhs.HigherCard[0])						return true;
-				else if (HigherCard[0] == rhs.HigherCard[0]) {
-					if (HigherCard[1] < rhs.HigherCard[1])					return true;
-				}
-			}
-		}
-
-	}
-
-	return false;
-}
-
 
 string FlushSymmType::strStat() {
 
@@ -295,7 +276,7 @@ unsigned int CProbEval::FindRank2PocketMask(unsigned int s) {
 			return it->first;
 
 	cerr << "The index is not correct";
-	return NULL;
+	return -1;
 }
 
 unsigned long long CProbEval::FindRank2FlopMask(unsigned int s) {
@@ -305,7 +286,7 @@ unsigned long long CProbEval::FindRank2FlopMask(unsigned int s) {
 			return it->first;
 
 	cerr << "The index is not correct";
-	return NULL;
+	return -1;
 }
 
 unsigned int CProbEval::HandUnsuitRank91_Index(unsigned long long Pocket) {
@@ -335,7 +316,7 @@ vector<vector<double> >* CProbEval::LoadFlopProb_fromFile(unsigned long long Flo
 	///////////////////// Loading Files to Vectors
 	ifstream inFile;
 	string filePath;
-	string basePath = "C:/Users/khatami/Google Drive/Mehrdad/Poker/HandEvalCpp/HandEvalCpp/PokerProj/FlopFilesFinal/";
+	string basePath = "./FlopFilesFinal/";
 	string line;
 	char dummy[20];
 	for (size_t s = 0; s < suitSymmSize; s++)

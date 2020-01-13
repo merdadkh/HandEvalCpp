@@ -56,6 +56,28 @@ public:
 
 };
 
+inline bool FlushSymmType::operator< (const FlushSymmType& rhs) const {
+	if (drawType[0] < rhs.drawType[0])								return true;
+	else if (drawType[0] == rhs.drawType[0]) 
+	{
+		if (drawType[1] < rhs.drawType[1])							return true;
+		else if (drawType[1] == rhs.drawType[1])
+		{
+			if ((SameSuit == false) && (rhs.SameSuit == true))		return true;
+			else if (SameSuit == rhs.SameSuit)
+			{
+				if (HigherCard[0] < rhs.HigherCard[0])				return true;
+				else if (HigherCard[0] == rhs.HigherCard[0]) 
+				{
+					if (HigherCard[1] < rhs.HigherCard[1])			return true;
+				}
+			}
+		}
+
+	}
+
+	return false;
+}
 
 class CProbEval
 {
@@ -95,8 +117,6 @@ private:
 
 	static vector<long> Win_Tie_Loss_Cnt;
 	static vector<vector<double> > vFlopProb;
-
-	
 
 };
 

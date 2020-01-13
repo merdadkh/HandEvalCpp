@@ -112,6 +112,20 @@ map<unsigned long long, CHandIterator::PocketHand169Enum> CHandIterator::CreateP
 const map<unsigned long long, CHandIterator::PocketHand169Enum> CHandIterator::pocketdict = CreatePocketMap();
 
 
+map<unsigned long long, size_t> CHandIterator::CreateTwoCardMap()
+{
+	map<unsigned long long, size_t> pocketMap;
+	for (size_t i = 0; i < POCKET_HAND_COUNT; i++)
+	{
+		unsigned long long mask = CHandIterator::TwoCardTable[i];
+
+		pocketMap.insert(pair<unsigned long long, size_t>(mask, i));
+	}
+	return pocketMap;
+}
+
+const map<unsigned long long, size_t> CHandIterator::PocketMask2IndexMap = CreateTwoCardMap();
+
 
 
 // Tables

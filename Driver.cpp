@@ -6,7 +6,6 @@
 int main(int argc, char *argv[])
 {
 
-	//string ans = "y";
 	//while (ans == "y")
 	//{
 	//	cout << "Testing Describtion" << endl;
@@ -15,7 +14,24 @@ int main(int argc, char *argv[])
 	//	cin >> ans;
 	//} 
 
-	ComputePreFlopPr();
+	//ComputePreFlopPrFull();
+	//ComputeSaveFlopProb2File();
+
+	TestFlopLoadFromFile();
+
+	//TestPostFlopTime();
+	//Create_TwoCard2HighCardRankTbl();
+
+	
+	//string ans = "y";
+
+	//while (ans == "y")
+	//{
+	//	cout << "Testing Flush Draw" << endl;
+	//	TestFlushDraw();
+	//	cout << "Another Test(y/n) :";
+	//	cin >> ans;
+	//}
 
 
 	return 0;

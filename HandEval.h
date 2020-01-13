@@ -10,6 +10,10 @@ using namespace std;
 
 #include "Utilities.h"
 
+
+#define POCKET_HAND_COUNT 1326
+#define POCKET_PREFLOP_COUNT 169
+
 class CHandEval
 {
 
@@ -138,7 +142,7 @@ public:
 
 	static int BitCount(unsigned long long bitField);
 
-private: 
+public: 
 	/// <summary> Updates handmask and handval, called when card strings change </summary>
 	void UpdateHandMask();
 
@@ -155,14 +159,15 @@ private:
 	
 
 
-	// Lookup Tables
-private:
+	// Lookup Tables Const --> Public
+public:
 
 	/// <summary> Bit count table from snippets.org </summary>
 	static const uint8_t bits[];
 	static const uint16_t nBitsAndStrTable[];
 	static const uint16_t topCardTable[];
 	static const uint32_t topFiveCardsTable[];
+	static const int8_t pocket2HighCardRankTable[];
 
 	/// <summary> This table returns a straights starting card (0 if not a straight) </summary>
 	static const uint16_t straightTable[];

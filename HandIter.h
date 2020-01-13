@@ -730,11 +730,13 @@ public:		// Lookup Tables
 		Pocket32o = 168
 	};
 
-private:
+public:
 	
 	static const map<unsigned long long, PocketHand169Enum> pocketdict;
 	static map<unsigned long long, PocketHand169Enum> CreatePocketMap();
 
+	static const map<unsigned long long, size_t> PocketMask2IndexMap;
+	static map<unsigned long long, size_t> CreateTwoCardMap();
 
 };
 
