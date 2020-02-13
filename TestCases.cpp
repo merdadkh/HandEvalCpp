@@ -163,8 +163,8 @@ void ComputePreFlopPr() {
 				k++;
 				SecondPocket = CHandIterator::Pocket169Table[j][k];
 			}
-
-			//Stat[i][j] = CProbEval::Count_Win_Loss_Tie(FirstPocket, SecondPocket);
+			
+			Stat[i][j] = *CProbEval::Count_Win_Loss_Tie(FirstPocket, SecondPocket);
 
 		}
 
@@ -316,7 +316,7 @@ void ComputeSaveFlopProb2File() {
 	ofstream ofs;
 
 	string filePath;
-	string basePath = "C:/Users/khatami/Google Drive/Mehrdad/Poker/HandEvalCpp/HandEvalCpp/PokerProj/FlopFiles/";
+	string basePath = "./FlopFiles/";
 
 	for (size_t f = 0; f < flopSize; f++) 
 	{
@@ -355,9 +355,9 @@ void ComputePreFlopPrFull() {
 	vector<long>* WTL;		// win tie lose
 
 
-	vector<vector<double> >  Output(handCount, vector<double>(handCount, -1));
+	vector<vector<double> > Output(handCount, vector<double>(handCount, -1));
 	
-	string basePath = "C:/Users/khatami/Google Drive/Mehrdad/Poker/HandEvalCpp/HandEvalCpp/PokerProj/PreFlop/PreFlopProb";
+	string basePath = "./PreFlop/PreFlopProb";
 
 	ofstream ofs(basePath.c_str());
 	ofs.precision(3);
@@ -389,6 +389,7 @@ void ComputePreFlopPrFull() {
 		ofs << "\n";
 	}
 
+	ofs.close();
 }
 
 
