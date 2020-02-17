@@ -395,21 +395,8 @@ void ComputePreFlopPrFull() {
 
 
 
-void TestFlopLoadFromFile() {
-
-	//string H1;
-	//cout << "Type a Hand 1 (no spaces):";
-	//cin >> H1;
-
-	//unsigned long long H1Mask = CHandEval::ParseHand(H1);
-
-
-	//string H2;
-	//cout << "\nType a Hand 2 (no spaces):";
-	//cin >> H2;
-
-	//unsigned long long H2Mask = CHandEval::ParseHand(H2);
-
+void TestFlopLoadFromFile() 
+{
 
 	string flop;
 	cout << "\nType a flop (no spaces):";
@@ -423,7 +410,7 @@ void TestFlopLoadFromFile() {
 
 	unsigned long long flopMask = CHandEval::ParseHand(flop);
 
-	vector<vector<double> >* vector = CProbEval::LoadFlopProb_fromFile(flopMask);
+	double* vector = CProbEval::LoadFlopProb_fromFile(flopMask);
 
 	duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 	cout << "Flop Prob Load: " << duration << " second" << endl;
@@ -450,9 +437,9 @@ void TestFlopLoadFromFile() {
 			int count = 0;
 			for (size_t i = 0; i < POCKET_HAND_COUNT; i++) {
 
-				if (vector->at(h1_index).at(i) >= 0)
+				if (vector[h1_index * POCKET_HAND_COUNT + i] >= 0)
 				{
-					sum += vector->at(h1_index).at(i);
+					sum += vector[h1_index * POCKET_HAND_COUNT + i];
 					count++;
 				}
 			}
@@ -461,7 +448,7 @@ void TestFlopLoadFromFile() {
 		else {
 			unsigned long long hand2Mask = CHandEval::ParseHand(hand2);
 			size_t h2_index = CHandIterator::PocketMask2IndexMap.find(hand2Mask)->second;
-			out = vector->at(h1_index).at(h2_index);
+			out = vector[h1_index * POCKET_HAND_COUNT + h2_index];
 		}
 
 		cout << "\nProb: " << out;
@@ -476,4 +463,66 @@ void TestFlopLoadFromFile() {
 
 
 	
+}
+
+void TestPreFlopLoadFromFile() {
+
+
+	std::clock_t start;
+	double duration;
+
+	// 5 Card Iterator 
+	start = std::clock();
+
+	
+	double* vector = CProbEval::LoadPreFlopProb_fromFile();
+
+	duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+	cout << "PreFlop Prob Load: " << duration << " second" << endl;
+
+
+
+	string ans = "y";
+
+	while (ans != "n")
+	{
+
+		string hand1, hand2;
+		cout << "\nType hand 1 (no spaces):";
+		cin >> hand1;
+		cout << "\nType hand 2 (no spaces):";
+		cin >> hand2;
+
+		unsigned long long hand1Mask = CHandEval::ParseHand(hand1);
+		size_t h1_index = CHandIterator::PocketMask2IndexMap.find(hand1Mask)->second;
+
+		double out;
+		if (hand2 == "n") {
+			double sum = 0;
+			int count = 0;
+			for (size_t i = 0; i < POCKET_HAND_COUNT; i++) {
+
+				if (vector[h1_index * POCKET_HAND_COUNT + i] >= 0)
+				{
+					sum += vector[h1_index * POCKET_HAND_COUNT + i];
+					count++;
+				}
+			}
+			out = sum / count;
+		}
+		else {
+			unsigned long long hand2Mask = CHandEval::ParseHand(hand2);
+			size_t h2_index = CHandIterator::PocketMask2IndexMap.find(hand2Mask)->second;
+			out = vector[h1_index * POCKET_HAND_COUNT + h2_index];
+		}
+
+		cout << "\nProb: " << out;
+
+
+
+
+		cout << "\nAnother Test(y/n) :";
+		cin >> ans;
+	}
+
 }

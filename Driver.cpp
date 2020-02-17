@@ -14,13 +14,13 @@ int main(int argc, char *argv[])
 	//	cin >> ans;
 	//} 
 
-	//ComputePreFlopPrFull();
-	//ComputeSaveFlopProb2File();
+	// ComputePreFlopPrFull();
+	// ComputeSaveFlopProb2File();
 
 	TestFlopLoadFromFile();
-
-	//TestPostFlopTime();
-	//Create_TwoCard2HighCardRankTbl();
+	TestPreFlopLoadFromFile();
+	// TestPostFlopTime();
+	// Create_TwoCard2HighCardRankTbl();
 
 	
 	//string ans = "y";

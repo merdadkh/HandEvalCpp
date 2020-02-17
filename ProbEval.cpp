@@ -301,8 +301,48 @@ unsigned int CProbEval::HandUnsuitRank91_Index(unsigned long long Pocket) {
 
 
 vector<vector<double> > CProbEval::vFlopProb = vector<vector<double> >(POCKET_HAND_COUNT, vector<double>(POCKET_HAND_COUNT, -1));
+vector<vector<double> > CProbEval::vPreFlopProb = vector<vector<double> >(POCKET_HAND_COUNT, vector<double>(POCKET_HAND_COUNT, -1));
 
-vector<vector<double> >* CProbEval::LoadFlopProb_fromFile(unsigned long long Flop) {
+double CProbEval::FlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT] = { -1 };
+double CProbEval::PreFlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT] = { -1 };
+
+double* CProbEval::LoadPreFlopProb_fromFile() 
+{
+	size_t pocketSize = CProbEval::PocketMask2UnsuitRank_Dict.size();
+
+	ifstream inFile;
+	string filePath;
+	string basePath = "./PreFlopFinal/";
+	string line;
+	char dummy[20];
+
+	filePath = basePath + "PreFlopProb";
+
+	// Write2File
+	size_t h1_offset;
+	inFile.open(filePath.c_str());
+	if (inFile.is_open()) 
+	{
+		getline(inFile, line);
+		for (size_t h1 = 0; h1 < POCKET_HAND_COUNT; h1++) {
+			inFile >> dummy;
+			inFile >> dummy;
+			h1_offset = h1 * POCKET_HAND_COUNT;
+			for (size_t h2 = 0; h2 < POCKET_HAND_COUNT; h2++) {
+				inFile >> PreFlopProbArr[h1_offset + h2]; // vPreFlopProb[h1][h2];
+			}
+		}
+		inFile.close();
+	}
+	else
+	{
+		std::cout << "PreFlopFinal Not Found\n";
+	}
+
+	return &PreFlopProbArr[0];
+}
+
+double* CProbEval::LoadFlopProb_fromFile(unsigned long long Flop) {
 
 	size_t suitSymmSize = CProbEval::SuitSymm_Dict.size();
 	size_t pocketSize = CProbEval::PocketMask2UnsuitRank_Dict.size();
@@ -325,7 +365,8 @@ vector<vector<double> >* CProbEval::LoadFlopProb_fromFile(unsigned long long Flo
 
 		// Write2File
 		inFile.open(filePath.c_str());
-		if (inFile.is_open()) {
+		if (inFile.is_open()) 
+		{
 			getline(inFile, line);
 			for (size_t h1 = 0; h1 < pocketSize; h1++) {
 				inFile >> dummy;
@@ -335,32 +376,42 @@ vector<vector<double> >* CProbEval::LoadFlopProb_fromFile(unsigned long long Flo
 			}
 			inFile.close();
 		}
+		// else
+		// {
+		// 	std::cout << "FlopFilesFinal Not Found\n";
+		// }
+		
 	}
 
 	/////////////////////////////////////////////// Maping the loaded vectors to 1326x1326 Vector
-
+	size_t h1_offset, h2_offset;
 	vFlopProb = vector<vector<double> >(POCKET_HAND_COUNT, vector<double>(POCKET_HAND_COUNT, -1));
 
-	for (size_t h1 = 0; h1 < POCKET_HAND_COUNT; h1++) {
+	for (size_t h1 = 0; h1 < POCKET_HAND_COUNT; h1++) 
+	{
+		h1_offset = h1 * POCKET_HAND_COUNT;
 		unsigned long long FirstPocket = CHandIterator::TwoCardTable[h1];
 		if ((Flop & FirstPocket) == 0ULL)
 		{
 			unsigned int H1_Index = CProbEval::HandUnsuitRank91_Index(FirstPocket);
 			for (size_t h2 = h1 + 1; h2 < POCKET_HAND_COUNT; h2++)
 			{
+				h2_offset = h2 * POCKET_HAND_COUNT;
 				unsigned long long SecondPocket = CHandIterator::TwoCardTable[h2];
 				if (((Flop & SecondPocket) == 0ULL) && ((FirstPocket & SecondPocket) == 0))
 				{
 					unsigned int H2_Index = CProbEval::HandUnsuitRank91_Index(SecondPocket);
 					FlushSymmType flushSymm = CProbEval::ComputeFlopFlushSymm(FirstPocket, SecondPocket, Flop);
 					unsigned int SuitDraw_Index = CProbEval::SuitSymm_Dict.find(flushSymm)->second;
-					vFlopProb[h1][h2] = prob_Loaded[SuitDraw_Index][H1_Index][H2_Index];
-					vFlopProb[h2][h1] = 1 - vFlopProb[h1][h2];
+					// vFlopProb[h1][h2] = prob_Loaded[SuitDraw_Index][H1_Index][H2_Index];
+					// vFlopProb[h2][h1] = 1 - vFlopProb[h1][h2];
+					FlopProbArr[h1_offset + h2] = prob_Loaded[SuitDraw_Index][H1_Index][H2_Index];
+					FlopProbArr[h2_offset + h1] = 1 - FlopProbArr[h1_offset + h2];
 				}
 			}
 		}
 	}
 
 
-	return &vFlopProb;
+	return &FlopProbArr[0];
 }

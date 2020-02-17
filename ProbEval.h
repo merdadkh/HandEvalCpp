@@ -111,12 +111,16 @@ public:
 	static string  FlopMaskUnsuit2Str(unsigned long long FlopMaskUnsuit);
 	static string  RankUnsuit2Str(unsigned long long FlopMaskUnsuit);
 	
-	static vector<vector<double> >* LoadFlopProb_fromFile(unsigned long long Flop);
+	static double* LoadFlopProb_fromFile(unsigned long long Flop);
+	static double* LoadPreFlopProb_fromFile();
 
 private:
 
 	static vector<long> Win_Tie_Loss_Cnt;
 	static vector<vector<double> > vFlopProb;
+	static vector<vector<double> > vPreFlopProb;
+	static double FlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT];
+	static double PreFlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT];
 
 };
 

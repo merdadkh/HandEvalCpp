@@ -22,6 +22,6 @@ void TestFlushDraw();
 void ComputeSaveFlopProb2File();
 
 void TestFlopLoadFromFile();
-
+void TestPreFlopLoadFromFile();
 
 #endif
