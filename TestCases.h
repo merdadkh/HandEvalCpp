@@ -23,5 +23,6 @@ void ComputeSaveFlopProb2File();
 
 void TestFlopLoadFromFile();
 void TestPreFlopLoadFromFile();
+void TestAnyBoard();
 
 #endif

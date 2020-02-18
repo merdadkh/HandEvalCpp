@@ -48,20 +48,32 @@ vector<long>* CProbEval::Count_Win_Loss_Tie(unsigned long long FirstPocket, unsi
 
 	if (CHandEval::BitCount(FirstPocket | SecondPocket) == 4)
 	{
-		for (const unsigned long long& CompleteBoard : CHandIterator(NoBoardCard, BoardHand, FirstPocket | SecondPocket)) {
+		if (CHandEval::BitCount(BoardHand) < 5)
+		{
+			for (const unsigned long long& CompleteBoard : CHandIterator(NoBoardCard, BoardHand, FirstPocket | SecondPocket)) 
+			{
+				// Evaluate all hands and determine the best hand
+				unsigned int FirstHandValue = CHandEval::Evaluate(FirstPocket | CompleteBoard, 7);
+				unsigned int SecondHandValue = CHandEval::Evaluate(SecondPocket | CompleteBoard, 7);
 
-
-			// Evaluate all hands and determine the best hand
-			unsigned int FirstHandValue = CHandEval::Evaluate(FirstPocket | CompleteBoard, 7);
-			unsigned int SecondHandValue = CHandEval::Evaluate(SecondPocket | CompleteBoard, 7);
-
+				if (FirstHandValue == SecondHandValue)
+					Win_Tie_Loss_Cnt[Ties]++;
+				else if (FirstHandValue > SecondHandValue)
+					Win_Tie_Loss_Cnt[Wins]++;
+				else
+					Win_Tie_Loss_Cnt[Loss]++;
+			}
+		}
+		else if (CHandEval::BitCount(BoardHand) == 5)
+		{
+			unsigned int FirstHandValue = CHandEval::Evaluate(FirstPocket | BoardHand, 7);
+			unsigned int SecondHandValue = CHandEval::Evaluate(SecondPocket | BoardHand, 7);
 			if (FirstHandValue == SecondHandValue)
 				Win_Tie_Loss_Cnt[Ties]++;
 			else if (FirstHandValue > SecondHandValue)
 				Win_Tie_Loss_Cnt[Wins]++;
 			else
 				Win_Tie_Loss_Cnt[Loss]++;
-
 		}
 	}
 	
@@ -299,15 +311,11 @@ unsigned int CProbEval::HandUnsuitRank91_Index(unsigned long long Pocket) {
 
 }
 
-
-vector<vector<double> > CProbEval::vFlopProb = vector<vector<double> >(POCKET_HAND_COUNT, vector<double>(POCKET_HAND_COUNT, -1));
-vector<vector<double> > CProbEval::vPreFlopProb = vector<vector<double> >(POCKET_HAND_COUNT, vector<double>(POCKET_HAND_COUNT, -1));
-
-double CProbEval::FlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT] = { -1 };
-double CProbEval::PreFlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT] = { -1 };
+double CProbEval::ProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT] = { -1 };
 
 double* CProbEval::LoadPreFlopProb_fromFile() 
 {
+	std::fill(ProbArr, ProbArr + POCKET_HAND_COUNT * POCKET_HAND_COUNT, -1);
 	size_t pocketSize = CProbEval::PocketMask2UnsuitRank_Dict.size();
 
 	ifstream inFile;
@@ -329,7 +337,7 @@ double* CProbEval::LoadPreFlopProb_fromFile()
 			inFile >> dummy;
 			h1_offset = h1 * POCKET_HAND_COUNT;
 			for (size_t h2 = 0; h2 < POCKET_HAND_COUNT; h2++) {
-				inFile >> PreFlopProbArr[h1_offset + h2]; // vPreFlopProb[h1][h2];
+				inFile >> ProbArr[h1_offset + h2]; // vPreFlopProb[h1][h2];
 			}
 		}
 		inFile.close();
@@ -339,11 +347,11 @@ double* CProbEval::LoadPreFlopProb_fromFile()
 		std::cout << "PreFlopFinal Not Found\n";
 	}
 
-	return &PreFlopProbArr[0];
+	return &ProbArr[0];
 }
 
-double* CProbEval::LoadFlopProb_fromFile(unsigned long long Flop) {
-
+double* CProbEval::LoadFlopProb_fromFile(unsigned long long Flop) 
+{
 	size_t suitSymmSize = CProbEval::SuitSymm_Dict.size();
 	size_t pocketSize = CProbEval::PocketMask2UnsuitRank_Dict.size();
 
@@ -382,10 +390,10 @@ double* CProbEval::LoadFlopProb_fromFile(unsigned long long Flop) {
 		// }
 		
 	}
-
 	/////////////////////////////////////////////// Maping the loaded vectors to 1326x1326 Vector
+	std::fill(ProbArr, ProbArr + POCKET_HAND_COUNT * POCKET_HAND_COUNT, -1);
+
 	size_t h1_offset, h2_offset;
-	vFlopProb = vector<vector<double> >(POCKET_HAND_COUNT, vector<double>(POCKET_HAND_COUNT, -1));
 
 	for (size_t h1 = 0; h1 < POCKET_HAND_COUNT; h1++) 
 	{
@@ -403,15 +411,41 @@ double* CProbEval::LoadFlopProb_fromFile(unsigned long long Flop) {
 					unsigned int H2_Index = CProbEval::HandUnsuitRank91_Index(SecondPocket);
 					FlushSymmType flushSymm = CProbEval::ComputeFlopFlushSymm(FirstPocket, SecondPocket, Flop);
 					unsigned int SuitDraw_Index = CProbEval::SuitSymm_Dict.find(flushSymm)->second;
-					// vFlopProb[h1][h2] = prob_Loaded[SuitDraw_Index][H1_Index][H2_Index];
-					// vFlopProb[h2][h1] = 1 - vFlopProb[h1][h2];
-					FlopProbArr[h1_offset + h2] = prob_Loaded[SuitDraw_Index][H1_Index][H2_Index];
-					FlopProbArr[h2_offset + h1] = 1 - FlopProbArr[h1_offset + h2];
+					ProbArr[h1_offset + h2] = prob_Loaded[SuitDraw_Index][H1_Index][H2_Index];
+					ProbArr[h2_offset + h1] = 1 - ProbArr[h1_offset + h2];
 				}
 			}
 		}
 	}
 
+	return &ProbArr[0];
+}
 
-	return &FlopProbArr[0];
+double* CProbEval::ComputeProb(unsigned long long Board)
+{
+	std::fill(ProbArr, ProbArr + POCKET_HAND_COUNT * POCKET_HAND_COUNT, -1);
+
+	size_t h1_offset, h2_offset;
+	vector<long>* WTL;		// win tie lose
+
+	for (size_t h1 = 0; h1 < POCKET_HAND_COUNT; h1++)
+	{
+		h1_offset = h1 * POCKET_HAND_COUNT;
+		unsigned long long FirstPocket = CHandIterator::TwoCardTable[h1];
+		if ((Board & FirstPocket) == 0ULL)
+		{
+			for (size_t h2 = h1; h2 < POCKET_HAND_COUNT; h2++)
+			{
+				h2_offset = h2 * POCKET_HAND_COUNT;
+				unsigned long long SecondPocket = CHandIterator::TwoCardTable[h2];
+				if (((Board & SecondPocket) == 0ULL) && ((FirstPocket & SecondPocket) == 0))
+				{
+					WTL = CProbEval::Count_Win_Loss_Tie(FirstPocket, SecondPocket, Board);
+					ProbArr[h1_offset + h2] = (double)(WTL->at(CProbEval::Wins) + (double)WTL->at(CProbEval::Ties) / 2) / (double)(WTL->at(CProbEval::Wins) + WTL->at(CProbEval::Ties) + WTL->at(CProbEval::Loss));
+					ProbArr[h2_offset + h1] = 1 - ProbArr[h1_offset + h2];
+				}
+			}
+		}
+	}
+	return &ProbArr[0];
 }

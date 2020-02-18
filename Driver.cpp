@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 	//	cout << "Another Test(y/n) :";
 	//	cin >> ans;
 	//} 
-
-	// ComputePreFlopPrFull();
+	TestAnyBoard();
+	ComputePreFlopPrFull();
 	// ComputeSaveFlopProb2File();
 
 	TestFlopLoadFromFile();

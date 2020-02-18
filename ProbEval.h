@@ -113,14 +113,12 @@ public:
 	
 	static double* LoadFlopProb_fromFile(unsigned long long Flop);
 	static double* LoadPreFlopProb_fromFile();
+	static double* ComputeProb(unsigned long long Board);
 
 private:
 
 	static vector<long> Win_Tie_Loss_Cnt;
-	static vector<vector<double> > vFlopProb;
-	static vector<vector<double> > vPreFlopProb;
-	static double FlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT];
-	static double PreFlopProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT];
+	static double ProbArr[POCKET_HAND_COUNT * POCKET_HAND_COUNT];
 
 };
 

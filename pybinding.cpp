@@ -11,6 +11,13 @@ size_t Str2Index(std::string hand)
     return CHandIterator::PocketMask2IndexMap.find(hand1Mask)->second;
 }
 
+py::array_t<double> ComputeProb(std::string board) 
+{
+	unsigned long long boardMask = CHandEval::ParseHand(board);
+	double* prob = CProbEval::ComputeProb(boardMask);
+    return py::array_t<double>({POCKET_HAND_COUNT, POCKET_HAND_COUNT}, prob);
+}
+
 py::array_t<double> ComputeFlopProb(std::string flop) 
 {
 	unsigned long long flopMask = CHandEval::ParseHand(flop);
@@ -32,5 +39,6 @@ PYBIND11_MODULE(PokerProbEval, m)
     m.def("Str2Index", &Str2Index, "Convert Pocket str to index of probability matrix");
     m.def("ComputeFlopProb", &ComputeFlopProb, "A function to compute pre-Flop probabilty matrix");
     m.def("ComputePreFlopProb", &ComputePreFlopProb, "A function to compute post-Flop probabilty matrix");
+    m.def("ComputeProb", &ComputeProb, "A function to compute any board probabilty matrix");
 }
 
