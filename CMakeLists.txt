@@ -3,18 +3,17 @@ cmake_minimum_required (VERSION 3.12)
 # The project name
 project(PokerAI VERSION 0.1)
 
-find_package(pybind11 REQUIRED)
-
 set(ProbEvalSrcs 
         Hand_Tables.cpp
         HandEval.cpp
         HandIter.cpp
         ProbEval.cpp    
     )
-    
+
+add_subdirectory(pybind11)
 pybind11_add_module(PokerProbEval pybinding.cpp ${ProbEvalSrcs})
+
 target_compile_options(PokerProbEval PUBLIC -Ofast)
-set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
 
 add_executable( HandEval
                 Driver.cpp
